@@ -12,23 +12,70 @@ import {
 import { Feather } from "@expo/vector-icons";
 import axios from "axios";
 import Card from "../components/Card";
+import {Searchbar} from 'react-native-paper'
+// import { SearchBar } from "react-native-screens";
+
+
+
 
 const HomeScreen = () => {
   const [cocktails, setCocktails] = useState([]);
-
+  const [search, setSearch] = useState('');
+  let result;
+  
   useEffect(() => {
     const fetchRandom = async () => {
       try {
-        const { data } = await axios.get(
-          "https://www.thecocktaildb.com/api/json/v1/1/search.php?f=a"
+        const { data } = await axios.get(`https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${search ? search  : 'margarita'}`
         );
+       if(data.drinks === null){
+        setCocktails([])
+        return;
+       }else{
         setCocktails(data.drinks);
+
+       }
       } catch (err) {
         console.log(err);
       }
     };
     fetchRandom();
-  }, []);
+  }, [search]);
+
+  const handleChange =async(name)=>{
+    setSearch(name)
+  }
+
+
+
+
+  if(cocktails.length > 0){
+    result = <FlatList
+    horizontal={false}
+    showsHorizontalScrollIndicator={false}
+    showsVerticalScrollIndicator={false}
+    ItemSeparatorComponent={<View className='w-10' ></View>}
+      numColumns={2}
+      data={cocktails}
+      keyExtractor={(item) => item.idDrink}
+      renderItem={({ item }) => {
+        return <Card item={item} />;
+      }}
+    />
+  }else if(cocktails.length === 0){
+    result = <View className="justify-center  mt-20 items-center">
+                <Text className='text-2xl font-extrabold text-red-500'>No result Found!!</Text>
+            </View>
+  }else{
+    result = <View className="justify-center flex-1 mt-20 items-center">
+                <ActivityIndicator   size="large" color="#00ff00"  />
+            </View>
+  }
+
+
+
+
+  
 
   return (
     <SafeAreaView className='bg-white' style={style.flex}>
@@ -50,37 +97,18 @@ const HomeScreen = () => {
           </View>
         </View>
 
-        {/* search bar */}
-        <View className="flex-row mt-3 items-center mx-4 pb-2">
-          <View className="flex-row flex-1 items-center p-3 rounded-full border-amber-400 border">
-            <Feather name="search" size={27} color="gray" />
-            <TextInput
+        <View  className="flex-row  items-center px-4 py-2 bg-pink-100">
+            <Searchbar
               placeholder="Search Your favourite Cocktails"
-              className="ml-3 flex-1 text-gray-500"
+              value={search}
+              onChangeText={handleChange}
+              className="ml-3 flex-1 text-sky-500 border border-sky-400"
             />
-          </View>
         </View>
         {/* end */}
 
         <View className="mt-4 w-full   px-1">
-          {cocktails.length > 0 ? (
-            <FlatList
-            horizontal={false}
-            showsHorizontalScrollIndicator={false}
-            showsVerticalScrollIndicator={false}
-            ItemSeparatorComponent={<View className='w-10' ></View>}
-              numColumns={2}
-              data={cocktails}
-              keyExtractor={(item) => item.idDrink}
-              renderItem={({ item }) => {
-                return <Card item={item} />;
-              }}
-            ></FlatList>
-          ) : (
-            <View className="justify-center flex-1 mt-20 items-center">
-                <ActivityIndicator   size="large" color="#00ff00"  />
-            </View>
-          )}
+          {result}
         </View>
       </View>
     </SafeAreaView>

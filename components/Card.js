@@ -19,10 +19,10 @@ const Card = ({item}) => {
             <Text className='font-light'>{item.strCategory}</Text>
         </View>
 
-        <View className="flex-row mt-3 items-center justify-between px-3">
+        {/* <View className="flex-row mt-3 items-center justify-between px-3">
             <Text className='font-light'>Glass:</Text>
             <Text className='font-light'>{item.strGlass}</Text>
-        </View>
+        </View> */}
 
         <View className="w-full mt-4 flex-row justify-center ">
             <TouchableOpacity onPress={handlePress} >
